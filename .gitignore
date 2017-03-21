@@ -1,0 +1,11 @@
+GoogleNews-vectors-negative300.bin
+Tensorflow and Word2Vec/
+__pycache__/
+datasets/
+misc/
+readbin.c
+transform_word2vec.c
+transform_word2vec.exe
+word2vec.py.old
+word2vec_indices
+word2vec_vectors
