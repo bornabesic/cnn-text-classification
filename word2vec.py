@@ -1,46 +1,39 @@
 import struct
 import numpy as np
 
-# initialization
-
 indices_dictionary=dict()
-
-with open("word2vec_vectors", "rb") as word2vec_vectors_file:
-	word2vec_vectors=word2vec_vectors_file.read()
-
-with open("word2vec_indices", "r", encoding="utf8") as word2vec_indices_file:
-	for line in word2vec_indices_file:
-		line_tokens = line.strip("\n").split("\t")
-		indices_dictionary[line_tokens[0]]=int(line_tokens[1])
-		del line_tokens
+word_limit=150000
 
 vector_dimension=300
 vector_size = vector_dimension*4
+
 vector_struct = struct.Struct("300f")
-empty_vector = [0 for _ in range(vector_dimension)]
 
-def get_embedding_vector(word):
-	if word=="__PAD__":
-		return empty_vector
+embeddings=np.empty(shape=[word_limit, vector_dimension], dtype=np.float32)
 
-	try:
-		word_index = indices_dictionary[word]
-		start = word_index*vector_size
-		end = start + vector_size
-		return list(vector_struct.unpack(word2vec_vectors[start:end]))
+with open("word2vec_vectors", "rb") as word2vec_vectors_file:
+	for i in range(word_limit):
+		bytes = word2vec_vectors_file.read(vector_size)
+		embeddings[i]=vector_struct.unpack(bytes)
 
-	except KeyError:
-		# TODO
-		# ako nema rijeci u rjecniku generirati nasumican vektor dimenzije 300 iz U[-a, a]
-		# a izabrati tako da je varijanca ista kao kod dosadasnjih poznatih vektora
-		#vectors[word]=(np.random.rand(vector_dimension)*1.5-0.75).tolist()
-		#return vectors[word]
-		return empty_vector
+embeddings[0]=[0 for _ in range(vector_dimension)]
 
+# initialization
+with open("word2vec_indices", "r", encoding="utf8") as word2vec_indices_file:
+	word_counter=0
+	for line in word2vec_indices_file:
+		if word_counter<word_limit:
+			line_tokens = line.strip("\n").split("\t")
+			indices_dictionary[line_tokens[0]]=int(line_tokens[1])
+		else:
+			break
+		word_counter+=1
 
-if __name__=="__main__":
-	print(get_embedding_vector("</s>"))
-
+def word_index(word):
+	if word not in indices_dictionary:
+		return 0
+	else:
+		return indices_dictionary[word]
 
 
 

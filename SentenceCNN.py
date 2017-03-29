@@ -2,7 +2,7 @@ import tensorflow as tf
 
 class SentenceCNN:
 
-	def __init__(self, model_name, session, learning_rate, optimizer, filter_sizes, num_filters, max_sentence_length, num_classes, embedding_dim, regularization_lambda, dropout_keep_prob):
+	def __init__(self, model_name, session, learning_rate, optimizer, filter_sizes, num_filters, max_sentence_length, num_classes, embeddings, embedding_dim, regularization_lambda, dropout_keep_prob):
 		self.model_name=model_name
 		self.session=session
 		self.learning_rate=learning_rate
@@ -11,6 +11,7 @@ class SentenceCNN:
 		self.regularization_lambda=regularization_lambda
 
 		self.base_path = "./"+model_name+"/"
+
 
 		###############
 		#
@@ -21,12 +22,16 @@ class SentenceCNN:
 		#	self.output		name="output"
 		#	+ additional parameters
 
-		self.input_x = tf.placeholder(shape=[None, max_sentence_length, embedding_dim], dtype=tf.float32, name="input_x")
+		self.input_x = tf.placeholder(shape=[None, max_sentence_length], dtype=tf.int32, name="input_x")
 		self.input_y = tf.placeholder(shape=[None, num_classes], dtype=tf.float32, name="input_y")
 		self.dropout_keep_prob = tf.placeholder(dtype=tf.float32, name="dropout_keep_prob")
 
+		# ===== EMBEDDING LAYER
+		self.embeddings=tf.Variable(embeddings, trainable=False)
+		self.embedded_words = tf.nn.embedding_lookup(self.embeddings, self.input_x)
+
 		# ===== CONVOLUTIONAL LAYER
-		self.input_x_expanded = tf.expand_dims(self.input_x, -1)
+		self.input_x_expanded = tf.expand_dims(self.embedded_words, -1)
 
 		self.pool_results=[]
 		for filter_size in filter_sizes:

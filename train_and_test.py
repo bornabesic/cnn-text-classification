@@ -1,7 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import data
-from word2vec import get_embedding_vector, vector_dimension
+from word2vec import word_index, vector_dimension, embeddings
 from SentenceCNN import SentenceCNN
 import tensorflow as tf
 import numpy as np
@@ -29,25 +29,16 @@ for sentence, label in train:
 
 print("Max sentence length: " + str(max_sentence_length))
 
-padding_vector = get_embedding_vector("__PAD__")
-
 # train data prepare
-
-paddings=dict()
 
 for i in range(len(train)):
 	sentence, label = train[i]
 	words = sentence.split(" ")
 
 	pad_size = max_sentence_length-len(words)
-	if pad_size not in paddings:
-		paddings[pad_size]=[padding_vector for _ in range(pad_size)]
 
-	embeddings = [get_embedding_vector(w) for w in words]  + paddings[pad_size]
-
-	train[i] = (embeddings, label)
-	del sentence
-	del words[:]
+	word_indices = [word_index(w) for w in words] + [0 for _ in range(pad_size)]
+	train[i]=(word_indices,label)
 
 # test data prepare
 
@@ -56,14 +47,9 @@ for i in range(len(test)):
 	words = sentence.split(" ")
 
 	pad_size = max_sentence_length-len(words)
-	if pad_size not in paddings:
-		paddings[pad_size]=[padding_vector for _ in range(pad_size)]
 
-	embeddings = [get_embedding_vector(w) for w in words]  + paddings[pad_size]
-
-	test[i] = (embeddings, label)
-	del sentence
-	del words[:]
+	word_indices = [word_index(w) for w in words] + [0 for _ in range(pad_size)]
+	test[i]=(word_indices,label)
 
 with tf.Session() as sess:
 
@@ -76,10 +62,11 @@ with tf.Session() as sess:
 		optimizer=tf.train.AdamOptimizer,
 		filter_sizes=[5, 7],
 		num_filters=FLAGS.NUM_FILTERS,
+		embeddings=embeddings,
 		max_sentence_length=max_sentence_length,
 		num_classes=num_classes,
 		embedding_dim=vector_dimension,
-		regularization_lambda=0.8,
+		regularization_lambda=0.9,
 		dropout_keep_prob=0.6
 	)
 
@@ -90,8 +77,8 @@ with tf.Session() as sess:
 
 			i=0
 			while i<len(train)-FLAGS.BATCH_SIZE:
-				embeddings, labels = zip(*train[i:i+FLAGS.BATCH_SIZE])
-				loss = neural_network.train_step(embeddings, labels)
+				indices, labels = zip(*train[i:i+FLAGS.BATCH_SIZE])
+				loss = neural_network.train_step(indices, labels)
 				avg_loss+=loss
 				i+=FLAGS.BATCH_SIZE
 			avg_loss/=(i/FLAGS.BATCH_SIZE)
@@ -103,8 +90,8 @@ with tf.Session() as sess:
 	print("Training DONE. Evaluating...")
 	correct=0
 	for i in range(len(test)):
-		embedding, label = test[i]
-		output, predictions = neural_network.feed([embedding])
+		indices, label = test[i]
+		output, predictions = neural_network.feed([indices])
 		accuracy=label[predictions[0]]
 		correct+=accuracy
 	
