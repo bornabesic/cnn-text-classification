@@ -12,6 +12,7 @@ with open("word2vec_indices", "r", encoding="utf8") as word2vec_indices_file:
 	for line in word2vec_indices_file:
 		line_tokens = line.strip("\n").split("\t")
 		indices_dictionary[line_tokens[0]]=int(line_tokens[1])
+		del line_tokens
 
 vector_dimension=300
 vector_size = vector_dimension*4

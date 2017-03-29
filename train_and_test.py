@@ -33,21 +33,37 @@ padding_vector = get_embedding_vector("__PAD__")
 
 # train data prepare
 
+paddings=dict()
+
 for i in range(len(train)):
 	sentence, label = train[i]
 	words = sentence.split(" ")
-	embeddings = [get_embedding_vector(w) for w in words]  + [padding_vector for _ in range(max_sentence_length-len(words))]
+
+	pad_size = max_sentence_length-len(words)
+	if pad_size not in paddings:
+		paddings[pad_size]=[padding_vector for _ in range(pad_size)]
+
+	embeddings = [get_embedding_vector(w) for w in words]  + paddings[pad_size]
 
 	train[i] = (embeddings, label)
+	del sentence
+	del words[:]
 
 # test data prepare
 
 for i in range(len(test)):
 	sentence, label = test[i]
 	words = sentence.split(" ")
-	embeddings = [get_embedding_vector(w) for w in words]  + [padding_vector for _ in range(max_sentence_length-len(words))]
+
+	pad_size = max_sentence_length-len(words)
+	if pad_size not in paddings:
+		paddings[pad_size]=[padding_vector for _ in range(pad_size)]
+
+	embeddings = [get_embedding_vector(w) for w in words]  + paddings[pad_size]
 
 	test[i] = (embeddings, label)
+	del sentence
+	del words[:]
 
 with tf.Session() as sess:
 

@@ -108,5 +108,34 @@ def load(dataset_name):
 
 		return train, test, 2
 
+	elif dataset_name=="20-newsgroup":
+		one_hot = {
+			"alt": [1, 0, 0, 0, 0, 0, 0],
+			"comp": [0, 1, 0, 0, 0, 0, 0],
+			"misc": [0, 0, 1, 0, 0, 0, 0],
+			"rec": [0, 0, 0, 1, 0, 0, 0],
+			"sci": [0, 0, 0, 0, 1, 0, 0],
+			"soc": [0, 0, 0, 0, 0, 1, 0],
+			"talk": [0, 0, 0, 0, 0, 0, 1]
+		}
+
+		with open(base_path+"20-newsgroup/20ng-train-no-stop.txt") as train_set:
+			for line in train_set:
+				tokens = line.split(" ")
+				category = tokens[0].split(".")[0]
+				sentence = " ".join(tokens[1:])
+
+				train.append((process_sentence(sentence), one_hot[category]))
+
+		with open(base_path+"20-newsgroup/20ng-test-no-stop.txt") as test_set:
+			for line in test_set:
+				tokens = line.split(" ")
+				category = tokens[0].split(".")[0]
+				sentence = " ".join(tokens[1:])
+
+				test.append((process_sentence(sentence), one_hot[category]))
+
+		return train, test, 7
+
 	else:
 		raise ValueError("Unknown dataset.")
