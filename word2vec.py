@@ -16,7 +16,9 @@ with open("word2vec_vectors", "rb") as word2vec_vectors_file:
 		bytes = word2vec_vectors_file.read(vector_size)
 		embeddings[i]=vector_struct.unpack(bytes)
 
-embeddings[0]=[0 for _ in range(vector_dimension)]
+# TODO vector for unknown words
+# embeddings[0]=[0 for _ in range(vector_dimension)]
+#
 
 # initialization
 with open("word2vec_indices", "r", encoding="utf8") as word2vec_indices_file:

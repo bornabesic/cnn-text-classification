@@ -2,7 +2,7 @@ import tensorflow as tf
 
 class SentenceCNN:
 
-	def __init__(self, model_name, session, learning_rate, optimizer, filter_sizes, num_filters, max_sentence_length, num_classes, embeddings, embedding_dim, regularization_lambda, dropout_keep_prob):
+	def __init__(self, model_name, session, learning_rate, optimizer, filter_sizes, num_filters, max_sentence_length, num_classes, embeddings, static, embedding_dim, regularization_lambda, dropout_keep_prob):
 		self.model_name=model_name
 		self.session=session
 		self.learning_rate=learning_rate
@@ -27,7 +27,7 @@ class SentenceCNN:
 		self.dropout_keep_prob = tf.placeholder(dtype=tf.float32, name="dropout_keep_prob")
 
 		# ===== EMBEDDING LAYER
-		self.embeddings=tf.Variable(embeddings, trainable=False)
+		self.embeddings=tf.Variable(embeddings, trainable = not static)
 		self.embedded_words = tf.nn.embedding_lookup(self.embeddings, self.input_x)
 
 		# ===== CONVOLUTIONAL LAYER
