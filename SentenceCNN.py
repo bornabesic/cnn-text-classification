@@ -2,7 +2,20 @@ import tensorflow as tf
 
 class SentenceCNN:
 
-	def __init__(self, model_name, session, learning_rate, optimizer, filter_sizes, num_filters, max_sentence_length, num_classes, embeddings, static, embedding_dim, regularization_lambda, dropout_keep_prob):
+	def __init__(self,
+		model_name, session,
+		learning_rate, optimizer,
+		filter_sizes,
+		num_filters,
+		max_sentence_length,
+		num_classes,
+		embeddings,
+		embedding_dim,
+		vocabulary_size,
+		static,
+		regularization_lambda,
+		dropout_keep_prob
+	):
 		self.model_name=model_name
 		self.session=session
 		self.learning_rate=learning_rate
@@ -27,7 +40,9 @@ class SentenceCNN:
 		self.dropout_keep_prob = tf.placeholder(dtype=tf.float32, name="dropout_keep_prob")
 
 		# ===== EMBEDDING LAYER
-		self.embeddings=tf.Variable(embeddings, trainable = not static)
+		self.embeddings_placeholder = tf.placeholder(tf.float32, shape=(vocabulary_size, embedding_dim))
+
+		self.embeddings=tf.Variable(self.embeddings_placeholder, trainable = not static)
 		self.embedded_words = tf.nn.embedding_lookup(self.embeddings, self.input_x)
 
 		# ===== CONVOLUTIONAL LAYER
@@ -36,7 +51,7 @@ class SentenceCNN:
 		self.pool_results=[]
 		for filter_size in filter_sizes:
 
-			
+
 			filter = tf.Variable(tf.truncated_normal(shape=[filter_size, embedding_dim, 1, num_filters], mean=0.5, stddev=0.2))
 			#filter = tf.Variable(tf.truncated_normal(shape=[filter_size, embedding_dim, 1, num_filters]))
 			bias = tf.Variable(tf.constant(0.0, shape=[num_filters]))
@@ -83,7 +98,7 @@ class SentenceCNN:
 		losses = tf.nn.softmax_cross_entropy_with_logits(labels=self.input_y, logits=self.output)
 		self.loss = tf.reduce_mean(losses) + self.regularization_lambda * l2_loss
 
-	
+
 
 		#
 		#
@@ -99,8 +114,8 @@ class SentenceCNN:
 		self.saver = tf.train.Saver()
 
 		# initialize variables
-		self.session.run(tf.global_variables_initializer())
-	
+		self.session.run(tf.global_variables_initializer(), feed_dict={self.embeddings_placeholder: embeddings})
+
 	def train_step(self, input_x, input_y): # TODO additional parameters
 		_, loss = self.session.run([self.train_op, self.loss], feed_dict={self.input_x: input_x, self.input_y: input_y, self.dropout_keep_prob: self.dropout_keep_prob_train}) # TODO additional parameters
 		return loss

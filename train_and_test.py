@@ -1,13 +1,15 @@
+#!/usr/bin/python3
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import data
-from word2vec import word_index, vector_dimension, embeddings
+from word2vec import word_index, vector_dimension, embeddings, vocabulary_size
 from SentenceCNN import SentenceCNN
 import tensorflow as tf
 import numpy as np
 import random
 
-tf.flags.DEFINE_integer("BATCH_SIZE", 16, "Training batch size")
+tf.flags.DEFINE_integer("BATCH_SIZE", 64, "Training batch size")
 tf.flags.DEFINE_integer("NUM_EPOCHS", 150, "Number of training epochs")
 tf.flags.DEFINE_string("DATASET", "TREC", "Dataset to perform training and testing on")
 tf.flags.DEFINE_integer("NUM_FILTERS", 64, "Number of filters per region size")
@@ -67,6 +69,7 @@ with tf.Session(config=config) as sess:
 		filter_sizes=[5, 7],
 		num_filters=FLAGS.NUM_FILTERS,
 		embeddings=embeddings,
+        vocabulary_size=vocabulary_size,
 		static=FLAGS.STATIC_EMBEDDINGS,
 		max_sentence_length=max_sentence_length,
 		num_classes=num_classes,
@@ -99,5 +102,5 @@ with tf.Session(config=config) as sess:
 		output, predictions = neural_network.feed([indices])
 		accuracy=label[predictions[0]]
 		correct+=accuracy
-	
+
 	print("Test set accuracy: " + str(correct/len(test)*100) + " %")
