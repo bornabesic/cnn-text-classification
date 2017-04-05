@@ -32,7 +32,7 @@ def load(dataset_name):
 	test=[]
 
 	if dataset_name=="MR":
-		with open(base_path+"rt-polaritydata/rt-polarity.neg") as negative:
+		with open(base_path+"rt-polaritydata/rt-polarity.neg", "r", encoding="utf8") as negative:
 			i=0
 			for sentence in negative:
 				if i<4000:
@@ -43,7 +43,7 @@ def load(dataset_name):
 				i+=1
 
 
-		with open(base_path+"rt-polaritydata/rt-polarity.pos") as positive:
+		with open(base_path+"rt-polaritydata/rt-polarity.pos", "r", encoding="utf8") as positive:
 			i=0
 			for sentence in positive:
 				if i<4000:
@@ -65,7 +65,7 @@ def load(dataset_name):
 			"NUM": [0, 0, 0, 0, 0, 1]
 		}
 
-		with open(base_path+"TREC/train_5500.label") as train_set:
+		with open(base_path+"TREC/train_5500.label", "r", encoding="utf8") as train_set:
 			for line in train_set:
 				tokens = line.split(" ")
 				category = tokens[0].split(":")[0]
@@ -73,7 +73,7 @@ def load(dataset_name):
 
 				train.append((process_sentence(sentence), one_hot[category]))
 
-		with open(base_path+"TREC/TREC_10.label") as test_set:
+		with open(base_path+"TREC/TREC_10.label", "r", encoding="utf8") as test_set:
 			for line in test_set:
 				tokens = line.split(" ")
 				category = tokens[0].split(":")[0]
@@ -84,7 +84,7 @@ def load(dataset_name):
 		return train, test, 6
 
 	elif dataset_name=="pros-cons":
-		with open(base_path+"pros-cons/IntegratedPros.txt") as pros:
+		with open(base_path+"pros-cons/IntegratedPros.txt", "r", encoding="utf8") as pros:
 			i=0
 			for sentence in pros:
 				clean_sentence = sentence.strip(" ").replace("<Pros>", "").replace("</Pros>", "")
@@ -94,8 +94,8 @@ def load(dataset_name):
 					test.append((process_sentence(clean_sentence), [1, 0]))
 
 				i+=1
-		
-		with open(base_path+"pros-cons/IntegratedCons.txt") as cons:
+
+		with open(base_path+"pros-cons/IntegratedCons.txt", "r", encoding="utf8") as cons:
 			i=0
 			for sentence in cons:
 				clean_sentence = sentence.strip(" ").replace("<Cons>", "").replace("</Cons>", "")
@@ -119,7 +119,7 @@ def load(dataset_name):
 			"talk": [0, 0, 0, 0, 0, 0, 1]
 		}
 
-		with open(base_path+"20-newsgroup/20ng-train-no-stop.txt") as train_set:
+		with open(base_path+"20-newsgroup/20ng-train-no-stop.txt", "r", encoding="utf8") as train_set:
 			for line in train_set:
 				tokens = line.split(" ")
 				category = tokens[0].split(".")[0]
@@ -127,7 +127,7 @@ def load(dataset_name):
 
 				train.append((process_sentence(sentence), one_hot[category]))
 
-		with open(base_path+"20-newsgroup/20ng-test-no-stop.txt") as test_set:
+		with open(base_path+"20-newsgroup/20ng-test-no-stop.txt", "r", encoding="utf8") as test_set:
 			for line in test_set:
 				tokens = line.split(" ")
 				category = tokens[0].split(".")[0]

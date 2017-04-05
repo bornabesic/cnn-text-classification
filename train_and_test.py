@@ -3,8 +3,11 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import data
+import time
+from datetime import datetime
 from word2vec import word_index, vector_dimension, embeddings, vocabulary_size
 from SentenceCNN import SentenceCNN
+from Logger import Logger
 import tensorflow as tf
 import numpy as np
 import random
@@ -12,17 +15,29 @@ import random
 tf.flags.DEFINE_integer("BATCH_SIZE", 64, "Training batch size")
 tf.flags.DEFINE_integer("NUM_EPOCHS", 150, "Number of training epochs")
 tf.flags.DEFINE_string("DATASET", "TREC", "Dataset to perform training and testing on")
+tf.flags.DEFINE_string("REGION_SIZES", "5,7", "Region sizes for convolutional layer")
 tf.flags.DEFINE_integer("NUM_FILTERS", 64, "Number of filters per region size")
 tf.flags.DEFINE_boolean("STATIC_EMBEDDINGS", True, "Word2Vec embeddings will not be fine-tuned during the training")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
-print("Hyperparameters:")
+
+today = datetime.today()
+logger = Logger(
+	"{}-{}-{}-{}-{}-{}-{}.txt".format(FLAGS.DATASET, today.day, today.month, today.year, today.hour, today.minute, today.second),
+	print_to_stdout=True
+)
+
+logger.log("Hyperparameters:")
 for param, value in FLAGS.__flags.items():
-    print("{}={}".format(param, value))
-print("")
+	logger.log(param + ": " + str(value))
+logger.log()
 
 train, test, num_classes = data.load(FLAGS.DATASET)
+
+logger.log("Train set size: " + str(len(train)))
+logger.log("Test set size: " + str(len(test)))
+logger.log("Classes: " + str(num_classes))
 
 max_sentence_length=0
 for sentence, label in train:
@@ -30,7 +45,8 @@ for sentence, label in train:
 	if len(tokens)>max_sentence_length:
 		max_sentence_length=len(tokens)
 
-print("Max sentence length: " + str(max_sentence_length))
+logger.log("Max sentence length: " + str(max_sentence_length))
+logger.log()
 
 # train data prepare
 
@@ -58,7 +74,6 @@ for i in range(len(test)):
 config = tf.ConfigProto()
 config.gpu_options.allow_growth=True
 with tf.Session(config=config) as sess:
-
 	#TREC filter_sizes=[5, 7], num_filters=64
 
 	neural_network = SentenceCNN(
@@ -66,10 +81,10 @@ with tf.Session(config=config) as sess:
 		session=sess,
 		learning_rate=3e-4,
 		optimizer=tf.train.AdamOptimizer,
-		filter_sizes=[5, 7],
+		filter_sizes=[int(region_size) for region_size in FLAGS.REGION_SIZES.split(",")],
 		num_filters=FLAGS.NUM_FILTERS,
 		embeddings=embeddings,
-        vocabulary_size=vocabulary_size,
+		vocabulary_size=vocabulary_size,
 		static=FLAGS.STATIC_EMBEDDINGS,
 		max_sentence_length=max_sentence_length,
 		num_classes=num_classes,
@@ -78,6 +93,7 @@ with tf.Session(config=config) as sess:
 		dropout_keep_prob=0.6
 	)
 
+	start_time = time.time()
 	try: # allow user to end training using Ctrl+C
 		for epoch in range(FLAGS.NUM_EPOCHS):
 			random.shuffle(train)
@@ -90,12 +106,16 @@ with tf.Session(config=config) as sess:
 				avg_loss+=loss
 				i+=FLAGS.BATCH_SIZE
 			avg_loss/=(i/FLAGS.BATCH_SIZE)
-			print("Epoch " + str(epoch) + " loss: " + str(avg_loss))
+			logger.log("Epoch " + str(epoch) + " loss: " + str(avg_loss))
 
 	except KeyboardInterrupt:
 		pass
 
-	print("Training DONE. Evaluating...")
+	end_time=time.time()
+	training_minutes=int((end_time-start_time)//60)
+	training_seconds=int((end_time-start_time)-training_minutes*60)
+
+	logger.log("Training DONE ({} m {} s). Evaluating...".format(training_minutes, training_seconds))
 	correct=0
 	for i in range(len(test)):
 		indices, label = test[i]
@@ -103,4 +123,6 @@ with tf.Session(config=config) as sess:
 		accuracy=label[predictions[0]]
 		correct+=accuracy
 
-	print("Test set accuracy: " + str(correct/len(test)*100) + " %")
+	logger.log("Test set accuracy: " + str(correct/len(test)*100) + " %")
+
+logger.close()
