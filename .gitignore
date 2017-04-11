@@ -2,6 +2,7 @@ GoogleNews-vectors-negative300.bin
 __pycache__/
 misc/
 logs/
+models/
 readbin.c
 transform_word2vec.c
 transform_word2vec.exe

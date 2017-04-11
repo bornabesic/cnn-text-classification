@@ -18,3 +18,9 @@ class Logger:
 
 	def close(self):
 		self.file.close()
+
+	def __enter__(self):
+		pass
+
+	def __exit__(self, type, value, traceback):
+		self.close()

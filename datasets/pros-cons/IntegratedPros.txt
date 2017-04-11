@@ -3339,7 +3339,7 @@
         <Pros>Great price 39.98 after rebate at best buy. </Pros>
         <Pros>Easy to install; fast printing;  attractive style</Pros>
         <Pros>Very fast printing, cheap price, good quality,seperate ink cartridges.</Pros>
-        <Pros>Fast, Individually Ink Cartridges,, Durabrite® Long Life Inks.</Pros>
+        <Pros>Fast, Individually Ink Cartridges,, DurabriteÂ® Long Life Inks.</Pros>
         <Pros>great picture and text quality...separate color ink tanks is good.</Pros>
         <Pros>High speed, Photo quality print</Pros>
         <Pros>- Speed, - Instant dry ink, - separate big ink tanks, - BRILLIANT photo prints</Pros>
@@ -18182,7 +18182,7 @@
 <Pros>Great OS, gorgeous styling--gets looks everywhere, the price (finally)</Pros>
 <Pros>Stylish, hot collectors item, SMALL</Pros>
 <Pros>Stylish, cool, blue backlight, good battery time, great sound/speaker combo</Pros>
-<Pros>¤ games</Pros>
+<Pros>Â¤ games</Pros>
 <Pros>Very stylish</Pros>
 <Pros>Lightweight, Good Screen, Good-Looking, Excellent Reception, Nice Design.</Pros>
 <Pros>Sleek Design, GPRS</Pros>
@@ -20511,7 +20511,7 @@
 <Pros>Smaller, sleeker, multiple numbers: one name, "nubbin" ok button,</Pros>
 <Pros>Perfect size, good flip opening angle, good ear piece</Pros>
 <Pros>Clarity, Loud, Long Battery Life, Great Features.</Pros>
-<Pros>Because it is Nokia 8850!Stylish, Durable, Infrared¡­¡­</Pros>
+<Pros>Because it is Nokia 8850!Stylish, Durable, InfraredÂ¡Â­Â¡Â­</Pros>
 <Pros>Stylish, elegant.</Pros>
 <Pros>Stylish, great reception, slider is pratical and functional</Pros>
 <Pros>perfect style-designed, high quality</Pros>
