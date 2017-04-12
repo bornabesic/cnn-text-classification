@@ -19,7 +19,7 @@ tf.flags.DEFINE_string("REGION_SIZES", "5,7", "Region sizes for convolutional la
 tf.flags.DEFINE_integer("NUM_FILTERS", 64, "Number of filters per region size")
 tf.flags.DEFINE_boolean("STATIC_EMBEDDINGS", True, "Word2Vec embeddings will not be fine-tuned during the training")
 tf.flags.DEFINE_float("REG_LAMBDA", 0.6, "Lambda regularization parameter")
-tf.flags.DEFINE_float("DROPOUT_KEEP_PROB", 0.6, "Neuron keep probability for dropout layer")
+tf.flags.DEFINE_float("DROPOUT_KEEP_PROB", 0.5, "Neuron keep probability for dropout layer")
 tf.flags.DEFINE_string("MODEL", "SentenceCNN", "Neural network model to use")
 
 FLAGS = tf.flags.FLAGS

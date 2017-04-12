@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-class SentenceCNN2:
+class SentenceCNN_TwoLayer_Xavier:
 
 	def __init__(self,
 		model_name, session,
@@ -43,57 +43,58 @@ class SentenceCNN2:
 		# ===== CONVOLUTIONAL LAYER
 		self.input_x_expanded = tf.expand_dims(self.embedded_words, -1)
 
-		conv1_results=[]
-		for filter_size in filter_sizes:
+		num_filters_conv1 = int(num_filters/3)
+		num_filters_conv2 = num_filters-num_filters_conv1
 
-			filter = tf.Variable(tf.truncated_normal(shape=[filter_size, embedding_dim, 1, num_filters]))
-			bias = tf.Variable(tf.constant(0.0, shape=[num_filters]))
+		self.pool_results=[]
+		for i, filter_size in enumerate(filter_sizes):
+
+			# ===== CONVOLUTIONAL LAYER 1
+
+			#filter1 = tf.Variable(tf.truncated_normal(shape=[filter_size, embedding_dim, 1, num_filters_conv1]))
+			filter1 = tf.get_variable("filter1_"+str(i), shape=[filter_size, embedding_dim, 1, num_filters_conv1], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+			bias1 = tf.Variable(tf.constant(0.0, shape=[num_filters_conv1]))
 
 			conv1 = tf.nn.conv2d(
 				input=self.input_x_expanded, # [batch, in_height, in_width, in_channels]
-				filter=filter, # [filter_height, filter_width, in_channels, out_channels]
+				filter=filter1, # [filter_height, filter_width, in_channels, out_channels]
 				strides=[1, 1, 1, 1],
 				padding="VALID"
 			)
 
-			relu = tf.nn.relu(tf.nn.bias_add(conv1, bias))
+			relu1 = tf.nn.relu(tf.nn.bias_add(conv1, bias1))
 
-			conv_dim = max_sentence_length-filter_size+1
+			conv1_dim = max_sentence_length-filter_size+1
 
-			conv1_results.append((relu,conv_dim))
+			# ===== CONVOLUTIONAL LAYER 2
 
-		# ===== CONVOLUTIONAL LAYER 2
-
-		filter_size=int(np.mean(filter_sizes))
-		self.pool_results=[]
-		for conv1_result, conv1_dim in conv1_results:
-
-			filter = tf.Variable(tf.truncated_normal(shape=[filter_size, 1, num_filters, num_filters//2]))
-			bias = tf.Variable(tf.constant(0.0, shape=[num_filters//2]))
+			#filter2 = tf.Variable(tf.truncated_normal(shape=[filter_size, 1, num_filters_conv1, num_filters_conv2]))
+			filter2 = tf.get_variable("filter2_"+str(i), shape=[filter_size, 1, num_filters_conv1, num_filters_conv2], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+			bias2 = tf.Variable(tf.constant(0.0, shape=[num_filters_conv2]))
 
 			conv2 = tf.nn.conv2d(
-				input=conv1_result, # [batch, in_height, in_width, in_channels]
-				filter=filter, # [filter_height, filter_width, in_channels, out_channels]
+				input=relu1, # [batch, in_height, in_width, in_channels]
+				filter=filter2, # [filter_height, filter_width, in_channels, out_channels]
 				strides=[1, 1, 1, 1],
 				padding="VALID"
 			)
 
-			relu = tf.nn.relu(tf.nn.bias_add(conv2, bias))
+			relu2 = tf.nn.relu(tf.nn.bias_add(conv2, bias2))
 
 			conv2_dim = conv1_dim-filter_size+1
 
+			# ===== MAX POOL
 			pooled = tf.nn.max_pool(
-				relu,
+				relu2,
 				ksize=[1, conv2_dim, 1, 1],
 				strides=[1, 1, 1, 1],
 				padding='VALID'
 			)
-
 			self.pool_results.append(pooled)
 
 		# FLATTENING LAYER
 
-		num_filters_total = num_filters//2 * len(filter_sizes)
+		num_filters_total = num_filters_conv2 * len(filter_sizes)
 		self.flat = tf.reshape(tf.concat(self.pool_results, 3), [-1, num_filters_total])
 
 		# DROPOUT LAYER
@@ -102,7 +103,8 @@ class SentenceCNN2:
 
 		# FULLY CONNECTED LAYER
 
-		W = tf.Variable(tf.truncated_normal(shape=[num_filters_total, num_classes]))
+		#W = tf.Variable(tf.truncated_normal(shape=[num_filters_total, num_classes]))
+		W = tf.get_variable("W", shape=[num_filters_total, num_classes], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
 		b = tf.Variable(tf.constant(0.1, shape=[num_classes]))
 
 		l2_loss = tf.nn.l2_loss(W) + tf.nn.l2_loss(b)
