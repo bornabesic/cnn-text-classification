@@ -193,6 +193,40 @@ def load_dataset(dataset_name):
 
 		return train, test, 7, one_hot, max_sentence_length
 
+	elif dataset_name=="ReutersR8":
+		one_hot = {
+			"acq": [1, 0, 0, 0, 0, 0, 0, 0],
+			"crude": [0, 1, 0, 0, 0, 0, 0, 0],
+			"earn": [0, 0, 1, 0, 0, 0, 0, 0],
+			"grain": [0, 0, 0, 1, 0, 0, 0, 0],
+			"interest": [0, 0, 0, 0, 1, 0, 0, 0],
+			"money-fx": [0, 0, 0, 0, 0, 1, 0, 0],
+			"ship": [0, 0, 0, 0, 0, 0, 1, 0],
+			"trade": [0, 0, 0, 0, 0, 0, 0, 1]
+		}
+
+		with open(base_path+"Reuters-21578_R8/r8-train-no-stop.txt", "r", encoding="utf8") as train_set:
+			for line in train_set:
+				tokens = line.split("\t")
+				category = tokens[0]
+				sentence = tokens[1]
+
+				clean_sentence = process_sentence(sentence)
+				length = sentence_length(clean_sentence)
+				if length>max_sentence_length: max_sentence_length=length
+
+				train.append((clean_sentence, one_hot[category]))
+
+		with open(base_path+"Reuters-21578_R8/r8-test-no-stop.txt", "r", encoding="utf8") as test_set:
+			for line in test_set:
+				tokens = line.split("\t")
+				category = tokens[0]
+				sentence = tokens[1]
+
+				test.append((process_sentence(sentence), one_hot[category]))
+
+		return train, test, 8, one_hot, max_sentence_length
+
 	else:
 		raise ValueError("Unknown dataset.")
 
@@ -232,4 +266,3 @@ def load_model(session, model, model_name):
 		setattr(neural_network, op, neural_network.session.graph.get_operation_by_name(op).outputs[0])
 
 	return neural_network
-
