@@ -10,7 +10,7 @@ def get_model_class(model):
 def sentence_length(sentence):
 	return sentence.count(" ")+1
 
-def index_and_align(sentence, length):
+def index_and_align(sentence, length, generate_new_vector=False):
 	words = sentence.split(" ")
 
 	pad_size = length-len(words)
@@ -19,7 +19,8 @@ def index_and_align(sentence, length):
 		words=words[0:length]
 		pad_size=0
 
-	word_indices = [word2vec.word_index(w) for w in words] + [0 for _ in range(pad_size)]
+	# TODO instead of index 0, try to leave out words for which embedding does not exist
+	word_indices = [word2vec.word_index(w, generate_new_vector) for w in words] + [0 for _ in range(pad_size)]
 	return word_indices
 
 def process_sentence(sentence):
@@ -44,7 +45,7 @@ def process_sentence(sentence):
 
 	sentence = " ".join(word_to_phrases)
 
-	return sentence.encode(sys.stdout.encoding, errors="replace").decode(sys.stdout.encoding).strip()
+	return sentence.encode(sys.stdout.encoding, errors="ignore").decode(sys.stdout.encoding).strip()
 
 def load_dataset(dataset_name):
 	base_path="./datasets/"

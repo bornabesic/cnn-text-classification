@@ -2,7 +2,7 @@ import struct
 import numpy as np
 
 indices_dictionary=dict()
-vocabulary_size=300000 # maximum
+vocabulary_size=300000
 
 vector_dimension=300
 vector_size = vector_dimension*4
@@ -11,11 +11,34 @@ vector_struct = struct.Struct("300f")
 
 embeddings=np.empty(shape=[vocabulary_size, vector_dimension], dtype=np.float32)
 
-def word_index(word):
+# a = sqrt(3*Var(X))
+# a = stddev(X) * sqrt(3)
+uniform_a = np.std(embeddings,0) * np.sqrt(3)
+
+# generate new vector with same variance as existing ones
+def generate_new_vector():
+	index=len(embeddings)
+
+	global vocabulary_size
+	vocabulary_size+=1
+
+	vector=[np.random.uniform(-a, a) for a in uniform_a]
+
+	embeddings.resize([index+1, vector_dimension], refcheck=False)
+	embeddings[index]=vector
+
+	return index
+
+
+def word_index(word, generate=False):
 	if word not in indices_dictionary:
-		return 0
-	else:
-		return indices_dictionary[word]
+		if not generate:
+			return 0
+
+		index = generate_new_vector()
+		indices_dictionary[word]=index
+
+	return indices_dictionary[word]
 
 # initialization
 with open("word2vec_vectors", "rb") as word2vec_vectors_file:
