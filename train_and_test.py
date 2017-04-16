@@ -12,15 +12,15 @@ import random
 from datetime import datetime
 from Logger import Logger
 
-tf.flags.DEFINE_integer("BATCH_SIZE", 16, "Training batch size")
-tf.flags.DEFINE_integer("NUM_EPOCHS", 150, "Number of training epochs")
+tf.flags.DEFINE_integer("BATCH_SIZE", 50, "Training batch size")
+tf.flags.DEFINE_integer("NUM_EPOCHS", 500, "Number of training epochs")
 tf.flags.DEFINE_string("DATASET", "TREC", "Dataset to perform training and testing on")
-tf.flags.DEFINE_string("REGION_SIZES", "5,7", "Region sizes for convolutional layer")
-tf.flags.DEFINE_integer("NUM_FILTERS", 64, "Number of filters per region size")
+tf.flags.DEFINE_string("REGION_SIZES", "3,4,5", "Region sizes for convolutional layer")
+tf.flags.DEFINE_integer("NUM_FILTERS", 100, "Number of filters per region size")
 tf.flags.DEFINE_boolean("STATIC_EMBEDDINGS", True, "Word2Vec embeddings will not be fine-tuned during the training")
 tf.flags.DEFINE_float("REG_LAMBDA", 0, "Lambda regularization parameter")
 tf.flags.DEFINE_float("DROPOUT_KEEP_PROB", 0.5, "Neuron keep probability for dropout layer")
-tf.flags.DEFINE_string("MODEL", "SentenceCNN_Xavier", "Neural network model to use")
+tf.flags.DEFINE_string("MODEL", "SentenceCNN_YoonKim_Xavier", "Neural network model to use")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()

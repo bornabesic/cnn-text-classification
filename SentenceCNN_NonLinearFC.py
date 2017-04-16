@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class SentenceCNN_Xavier:
+class SentenceCNN_NonLinearFC:
 
 	def __init__(self,
 		model_name=None, session=None,
@@ -80,20 +80,28 @@ class SentenceCNN_Xavier:
 
 		self.dropout = tf.nn.dropout(self.flat, self.dropout_keep_prob)
 
-		# FULLY CONNECTED LAYER
+		# FULLY CONNECTED LAYERS
 
-		W = tf.get_variable("W", shape=(num_filters_total, num_classes), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
-		b = tf.Variable(tf.constant(0.1, shape=(num_classes,)))
+		# HIDDEN LAYER
 
-		if regularization_lambda!=0:
-			l2_loss = tf.nn.l2_loss(W)
+		hidden_layer_size = (num_filters_total+num_classes)//2
+		W_hidden = tf.get_variable("W_hidden", shape=(num_filters_total, hidden_layer_size), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+		b_hidden = tf.Variable(tf.constant(0.1, shape=(hidden_layer_size,)))
 
-		self.output = tf.nn.xw_plus_b(self.dropout, W, b, name="output")
+		out_hidden = tf.nn.relu(tf.nn.xw_plus_b(self.dropout, W_hidden, b_hidden))
+
+		# OUTPUT LAYER
+
+		W_output = tf.get_variable("W_output", shape=(hidden_layer_size, num_classes), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+		b_output = tf.Variable(tf.constant(0.1, shape=(num_classes,)))
+
+		self.output = tf.nn.xw_plus_b(out_hidden, W_output, b_output, name="output")
+
 		self.predictions = tf.argmax(self.output, 1, name="predictions")
-
 
 		losses = tf.nn.softmax_cross_entropy_with_logits(labels=self.input_y, logits=self.output)
 		if regularization_lambda!=0:
+			l2_loss = tf.nn.l2_loss(W_hidden)+tf.nn.l2_loss(W_output)
 			self.loss = tf.add(tf.reduce_mean(losses), tf.multiply(self.regularization_lambda, l2_loss), name="loss")
 		else:
 			self.loss = tf.reduce_mean(losses, name="loss")
