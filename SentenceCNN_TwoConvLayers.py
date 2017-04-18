@@ -15,6 +15,7 @@ class SentenceCNN_TwoConvLayers:
 		embedding_dim,
 		vocabulary_size,
 		static,
+		max_l2_norm,
 		regularization_lambda,
 		dropout_keep_prob
 	):
@@ -57,6 +58,8 @@ class SentenceCNN_TwoConvLayers:
 			# ===== CONVOLUTIONAL LAYER 1
 
 			filter1 = tf.get_variable("filter1_"+str(i), shape=(filter_size, embedding_dim, 1, num_filters_conv1), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+			if max_l2_norm!=0:
+				filter1 = tf.clip_by_norm(filter1, max_l2_norm)
 			bias1 = tf.Variable(tf.constant(0.0, shape=(num_filters_conv1,)))
 
 			conv1 = tf.nn.conv2d(
@@ -73,6 +76,8 @@ class SentenceCNN_TwoConvLayers:
 			# ===== CONVOLUTIONAL LAYER 2
 
 			filter2 = tf.get_variable("filter2_"+str(i), shape=(filter_size, 1, num_filters_conv1, num_filters_conv2), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+			if max_l2_norm!=0:
+				filter2 = tf.clip_by_norm(filter2, max_l2_norm)
 			bias2 = tf.Variable(tf.constant(0.0, shape=(num_filters_conv2,)))
 
 			conv2 = tf.nn.conv2d(

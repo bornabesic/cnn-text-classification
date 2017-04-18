@@ -14,6 +14,7 @@ class SentenceCNN_YoonKim:
 		embedding_dim=None,
 		vocabulary_size=None,
 		static=None,
+		max_l2_norm=None,
 		regularization_lambda=None,
 		dropout_keep_prob=None
 	):
@@ -55,6 +56,8 @@ class SentenceCNN_YoonKim:
 		for filter_size in filter_sizes:
 
 			filter = tf.Variable(tf.truncated_normal(shape=(filter_size, embedding_dim, 1, num_filters)))
+			if max_l2_norm!=0:
+				filter = tf.clip_by_norm(filter, max_l2_norm)
 			bias = tf.Variable(tf.constant(0.0, shape=(num_filters,)))
 
 			conv = tf.nn.conv2d(

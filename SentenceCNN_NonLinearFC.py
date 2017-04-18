@@ -14,6 +14,7 @@ class SentenceCNN_NonLinearFC:
 		embedding_dim=None,
 		vocabulary_size=None,
 		static=None,
+		max_l2_norm=None,
 		regularization_lambda=None,
 		dropout_keep_prob=None
 	):
@@ -55,6 +56,8 @@ class SentenceCNN_NonLinearFC:
 		for i, filter_size in enumerate(filter_sizes):
 
 			filter = tf.get_variable("filter"+str(i), shape=(filter_size, embedding_dim, 1, num_filters), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+			if max_l2_norm!=0:
+				filter = tf.clip_by_norm(filter, max_l2_norm)
 			bias = tf.Variable(tf.constant(0.0, shape=(num_filters,)))
 
 			conv = tf.nn.conv2d(

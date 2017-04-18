@@ -21,6 +21,7 @@ tf.flags.DEFINE_boolean("STATIC_EMBEDDINGS", True, "Word2Vec embeddings will not
 tf.flags.DEFINE_float("REG_LAMBDA", 0, "Lambda regularization parameter")
 tf.flags.DEFINE_float("DROPOUT_KEEP_PROB", 0.5, "Neuron keep probability for dropout layer")
 tf.flags.DEFINE_string("MODEL", "SentenceCNN_YoonKim_Xavier", "Neural network model to use")
+tf.flags.DEFINE_string("MAX_L2_NORM", 3, "Maximum L2 norm for convolutional layer weights")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
@@ -82,6 +83,7 @@ with tf.Session(config=config) as sess, logger:
 		max_sentence_length=max_sentence_length,
 		num_classes=num_classes,
 		embedding_dim=word2vec.vector_dimension,
+		max_l2_norm=FLAGS.MAX_L2_NORM,
 		regularization_lambda=FLAGS.REG_LAMBDA,
 		dropout_keep_prob=FLAGS.DROPOUT_KEEP_PROB
 	)
