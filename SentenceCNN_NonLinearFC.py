@@ -10,6 +10,7 @@ class SentenceCNN_NonLinearFC:
 		max_sentence_length=None,
 		num_classes=None,
 		embeddings=None,
+		new_embeddings=None,
 		embedding_dim=None,
 		vocabulary_size=None,
 		static=None,
@@ -41,7 +42,11 @@ class SentenceCNN_NonLinearFC:
 		self.embeddings_placeholder = tf.placeholder(tf.float32, shape=(vocabulary_size, embedding_dim))
 
 		self.embeddings=tf.Variable(self.embeddings_placeholder, trainable = not static)
-		self.embedded_words = tf.nn.embedding_lookup(self.embeddings, self.input_x)
+		self.new_embeddings=tf.Variable(new_embeddings, trainable = True)
+
+		self.all_embeddings = tf.concat([self.embeddings, self.new_embeddings], axis=0)
+
+		self.embedded_words = tf.nn.embedding_lookup(self.all_embeddings, self.input_x)
 
 		# ===== CONVOLUTIONAL LAYER
 		self.input_x_expanded = tf.expand_dims(self.embedded_words, -1)

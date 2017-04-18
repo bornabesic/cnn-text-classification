@@ -76,6 +76,7 @@ with tf.Session(config=config) as sess, logger:
 		filter_sizes=[int(region_size) for region_size in FLAGS.REGION_SIZES.split(",")],
 		num_filters=FLAGS.NUM_FILTERS,
 		embeddings=word2vec.embeddings,
+		new_embeddings=word2vec.new_embeddings,
 		vocabulary_size=word2vec.vocabulary_size,
 		static=FLAGS.STATIC_EMBEDDINGS,
 		max_sentence_length=max_sentence_length,
