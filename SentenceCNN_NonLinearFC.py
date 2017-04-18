@@ -84,7 +84,7 @@ class SentenceCNN_NonLinearFC:
 
 		# HIDDEN LAYER
 
-		hidden_layer_size = (num_filters_total+num_classes)//2
+		hidden_layer_size = 2*num_classes
 		W_hidden = tf.get_variable("W_hidden", shape=(num_filters_total, hidden_layer_size), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
 		b_hidden = tf.Variable(tf.constant(0.1, shape=(hidden_layer_size,)))
 
