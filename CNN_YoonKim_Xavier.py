@@ -101,7 +101,7 @@ class CNN_YoonKim_Xavier:
 		losses = tf.nn.softmax_cross_entropy_with_logits(labels=self.input_y, logits=self.output)
 		if regularization_lambda!=0:
 			l2_loss = tf.nn.l2_loss(W)
-			self.loss = tf.add(tf.reduce_mean(losses), tf.multiply(self.regularization_lambda, l2_loss), name="loss")
+			self.loss = tf.reduce_mean(tf.add(losses, tf.multiply(self.regularization_lambda, l2_loss)), name="loss")
 		else:
 			self.loss = tf.reduce_mean(losses, name="loss")
 

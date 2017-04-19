@@ -102,18 +102,18 @@ with tf.Session(config=config) as sess, logger:
 	)
 
 	start_time = time.time()
+	batch_indices = data.generate_partitions(len(train), FLAGS.BATCH_SIZE)
 	try: # allow user to end training using Ctrl+C
 		for epoch in range(FLAGS.NUM_EPOCHS):
 			random.shuffle(train)
 			avg_loss=0
 
-			i=0
-			while i<len(train)-FLAGS.BATCH_SIZE:
-				indices, labels = zip(*train[i:i+FLAGS.BATCH_SIZE])
+			for start, end in batch_indices:
+				indices, labels = zip(*train[start:end])
 				loss = neural_network.train_step(indices, labels)
 				avg_loss+=loss
-				i+=FLAGS.BATCH_SIZE
-			avg_loss/=(i/FLAGS.BATCH_SIZE)
+
+			avg_loss/=len(batch_indices)
 			logger.log("Epoch " + str(epoch) + " loss: " + str(avg_loss))
 
 	except KeyboardInterrupt:

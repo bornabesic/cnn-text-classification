@@ -47,7 +47,6 @@ def process_sentence(sentence):
 
 	return sentence.encode(sys.stdout.encoding, errors="ignore").decode(sys.stdout.encoding).strip()
 
-
 def get_dataset_classes(dataset_name):
 	one_hot=None
 	if dataset_name=="MR":
@@ -91,7 +90,6 @@ def get_dataset_classes(dataset_name):
 			"trade": [0, 0, 0, 0, 0, 0, 0, 1]
 		}
 	return one_hot
-
 
 def load_dataset(dataset_name):
 	base_path="./datasets/"
@@ -278,3 +276,20 @@ def load_model(session, model, model_name):
 		setattr(neural_network, op, neural_network.session.graph.get_operation_by_name(op).outputs[0])
 
 	return neural_network
+
+def generate_partitions(total_size, partition_size):
+	partitions=[]
+	i=0
+	stop=False
+	while True:
+		start=i
+		end=start+partition_size
+		if end>total_size:
+			end=total_size
+			stop=True
+
+		partitions.append((start,end))
+		if stop:
+			break
+		i+=partition_size
+	return partitions
