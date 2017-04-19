@@ -300,7 +300,9 @@ def generate_partitions(total_size, partition_size):
 			end=total_size
 			stop=True
 
-		partitions.append((start,end))
+		if start!=end:
+			partitions.append((start,end))
+
 		if stop:
 			break
 		i+=partition_size
