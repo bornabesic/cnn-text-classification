@@ -47,6 +47,52 @@ def process_sentence(sentence):
 
 	return sentence.encode(sys.stdout.encoding, errors="ignore").decode(sys.stdout.encoding).strip()
 
+
+def get_dataset_classes(dataset_name):
+	one_hot=None
+	if dataset_name=="MR":
+		one_hot = {
+			"negative": [1, 0],
+			"positive": [0, 1]
+		}
+	elif dataset_name=="TREC":
+		one_hot = {
+			"ABBR": [1, 0, 0, 0, 0, 0],
+			"ENTY": [0, 1, 0, 0, 0, 0],
+			"DESC": [0, 0, 1, 0, 0, 0],
+			"HUM": [0, 0, 0, 1, 0, 0],
+			"LOC": [0, 0, 0, 0, 1, 0],
+			"NUM": [0, 0, 0, 0, 0, 1]
+		}
+	elif dataset_name=="pros-cons":
+		one_hot = {
+			"pros": [1, 0],
+			"cons": [0, 1]
+		}
+	elif dataset_name=="20-newsgroup":
+		one_hot = {
+			"alt": [1, 0, 0, 0, 0, 0, 0],
+			"comp": [0, 1, 0, 0, 0, 0, 0],
+			"misc": [0, 0, 1, 0, 0, 0, 0],
+			"rec": [0, 0, 0, 1, 0, 0, 0],
+			"sci": [0, 0, 0, 0, 1, 0, 0],
+			"soc": [0, 0, 0, 0, 0, 1, 0],
+			"talk": [0, 0, 0, 0, 0, 0, 1]
+		}
+	elif dataset_name=="ReutersR8":
+		one_hot = {
+			"acq": [1, 0, 0, 0, 0, 0, 0, 0],
+			"crude": [0, 1, 0, 0, 0, 0, 0, 0],
+			"earn": [0, 0, 1, 0, 0, 0, 0, 0],
+			"grain": [0, 0, 0, 1, 0, 0, 0, 0],
+			"interest": [0, 0, 0, 0, 1, 0, 0, 0],
+			"money-fx": [0, 0, 0, 0, 0, 1, 0, 0],
+			"ship": [0, 0, 0, 0, 0, 0, 1, 0],
+			"trade": [0, 0, 0, 0, 0, 0, 0, 1]
+		}
+	return one_hot
+
+
 def load_dataset(dataset_name):
 	base_path="./datasets/"
 
@@ -54,12 +100,11 @@ def load_dataset(dataset_name):
 	test=[]
 	max_sentence_length=0
 
-	if dataset_name=="MR":
-		one_hot = {
-			"negative": [1, 0],
-			"positive": [0, 1]
-		}
+	one_hot = get_dataset_classes(dataset_name)
+	if one_hot==None:
+		raise ValueError("Unknown dataset.")
 
+	if dataset_name=="MR":
 		with open(base_path+"rt-polaritydata/rt-polarity.neg", "r", encoding="utf8") as negative:
 			i=0
 			for sentence in negative:
@@ -92,14 +137,6 @@ def load_dataset(dataset_name):
 		return train, test, 2, one_hot, max_sentence_length
 
 	elif dataset_name=="TREC":
-		one_hot = {
-			"ABBR": [1, 0, 0, 0, 0, 0],
-			"ENTY": [0, 1, 0, 0, 0, 0],
-			"DESC": [0, 0, 1, 0, 0, 0],
-			"HUM": [0, 0, 0, 1, 0, 0],
-			"LOC": [0, 0, 0, 0, 1, 0],
-			"NUM": [0, 0, 0, 0, 0, 1]
-		}
 
 		with open(base_path+"TREC/train_5500.label", "r", encoding="utf8") as train_set:
 			for line in train_set:
@@ -126,10 +163,6 @@ def load_dataset(dataset_name):
 		return train, test, 6, one_hot, max_sentence_length
 
 	elif dataset_name=="pros-cons":
-		one_hot = {
-			"pros": [1, 0],
-			"cons": [0, 1]
-		}
 
 		with open(base_path+"pros-cons/IntegratedPros.txt", "r", encoding="utf8") as pros:
 			i=0
@@ -162,15 +195,6 @@ def load_dataset(dataset_name):
 		return train, test, 2, one_hot, max_sentence_length
 
 	elif dataset_name=="20-newsgroup":
-		one_hot = {
-			"alt": [1, 0, 0, 0, 0, 0, 0],
-			"comp": [0, 1, 0, 0, 0, 0, 0],
-			"misc": [0, 0, 1, 0, 0, 0, 0],
-			"rec": [0, 0, 0, 1, 0, 0, 0],
-			"sci": [0, 0, 0, 0, 1, 0, 0],
-			"soc": [0, 0, 0, 0, 0, 1, 0],
-			"talk": [0, 0, 0, 0, 0, 0, 1]
-		}
 
 		with open(base_path+"20-newsgroup/20ng-train-no-stop.txt", "r", encoding="utf8") as train_set:
 			for line in train_set:
@@ -195,16 +219,6 @@ def load_dataset(dataset_name):
 		return train, test, 7, one_hot, max_sentence_length
 
 	elif dataset_name=="ReutersR8":
-		one_hot = {
-			"acq": [1, 0, 0, 0, 0, 0, 0, 0],
-			"crude": [0, 1, 0, 0, 0, 0, 0, 0],
-			"earn": [0, 0, 1, 0, 0, 0, 0, 0],
-			"grain": [0, 0, 0, 1, 0, 0, 0, 0],
-			"interest": [0, 0, 0, 0, 1, 0, 0, 0],
-			"money-fx": [0, 0, 0, 0, 0, 1, 0, 0],
-			"ship": [0, 0, 0, 0, 0, 0, 1, 0],
-			"trade": [0, 0, 0, 0, 0, 0, 0, 1]
-		}
 
 		with open(base_path+"Reuters-21578_R8/r8-train-no-stop.txt", "r", encoding="utf8") as train_set:
 			for line in train_set:
@@ -227,9 +241,6 @@ def load_dataset(dataset_name):
 				test.append((process_sentence(sentence), one_hot[category]))
 
 		return train, test, 8, one_hot, max_sentence_length
-
-	else:
-		raise ValueError("Unknown dataset.")
 
 def save_model(model, step=None):
 	from os import makedirs

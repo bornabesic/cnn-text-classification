@@ -18,10 +18,12 @@ tf.flags.DEFINE_string("DATASET", "TREC", "Dataset to perform training and testi
 tf.flags.DEFINE_string("REGION_SIZES", "3,4,5", "Region sizes for convolutional layer")
 tf.flags.DEFINE_integer("NUM_FILTERS", 100, "Number of filters per region size")
 tf.flags.DEFINE_boolean("STATIC_EMBEDDINGS", True, "Word2Vec embeddings will not be fine-tuned during the training")
+tf.flags.DEFINE_float("MAX_L2_NORM", 3, "Maximum L2 norm for convolutional layer weights")
 tf.flags.DEFINE_float("REG_LAMBDA", 0, "Lambda regularization parameter")
 tf.flags.DEFINE_float("DROPOUT_KEEP_PROB", 0.5, "Neuron keep probability for dropout layer")
+tf.flags.DEFINE_float("LEARNING_RATE", 1e-3, "Initial learning rate value")
+tf.flags.DEFINE_float("LEARNING_DECAY_RATE", 0.95, "Rate at which learning rate will exponentially decay during the training")
 tf.flags.DEFINE_string("MODEL", "SentenceCNN_YoonKim_Xavier", "Neural network model to use")
-tf.flags.DEFINE_string("MAX_L2_NORM", 3, "Maximum L2 norm for convolutional layer weights")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
@@ -36,7 +38,7 @@ logger = Logger(
 )
 
 logger.log("Hyperparameters:")
-for param, value in FLAGS.__flags.items():
+for param, value in sorted(FLAGS.__flags.items()):
 	logger.log(param + ": " + str(value))
 logger.log()
 
@@ -72,7 +74,8 @@ with tf.Session(config=config) as sess, logger:
 	neural_network = model_class(
 		model_name=id_string,
 		session=sess,
-		learning_rate=3e-4,
+		learning_rate=FLAGS.LEARNING_RATE,
+		learning_decay_rate=FLAGS.LEARNING_DECAY_RATE,
 		optimizer=tf.train.AdamOptimizer,
 		filter_sizes=[int(region_size) for region_size in FLAGS.REGION_SIZES.split(",")],
 		num_filters=FLAGS.NUM_FILTERS,

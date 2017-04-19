@@ -6,6 +6,7 @@ class SentenceCNN_TwoConvLayers:
 	def __init__(self,
 		model_name, session,
 		learning_rate, optimizer,
+		learning_decay_rate,
 		filter_sizes,
 		num_filters,
 		max_sentence_length,
@@ -142,9 +143,9 @@ class SentenceCNN_TwoConvLayers:
 		# initialize variables
 		self.session.run(tf.global_variables_initializer(), feed_dict={self.embeddings_placeholder: embeddings})
 
-	def train_step(self, input_x, input_y): # TODO additional parameters
-		_, loss = self.session.run([self.train_op, self.loss], feed_dict={self.input_x: input_x, self.input_y: input_y, self.dropout_keep_prob: self.dropout_keep_prob_train}) # TODO additional parameters
+	def train_step(self, input_x, input_y):
+		_, loss = self.session.run([self.train_op, self.loss], feed_dict={self.input_x: input_x, self.input_y: input_y, self.dropout_keep_prob: self.dropout_keep_prob_train})
 		return loss
 
-	def feed(self, input_x): # TODO additional parameters
-		return self.session.run([self.output, self.predictions], feed_dict={self.input_x: input_x, self.dropout_keep_prob: 1}) # TODO additional parameters
+	def feed(self, input_x):
+		return self.session.run([self.output, self.predictions], feed_dict={self.input_x: input_x, self.dropout_keep_prob: 1})

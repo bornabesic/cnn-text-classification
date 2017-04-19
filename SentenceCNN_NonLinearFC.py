@@ -5,6 +5,7 @@ class SentenceCNN_NonLinearFC:
 	def __init__(self,
 		model_name=None, session=None,
 		learning_rate=None, optimizer=None,
+		learning_decay_rate=None,
 		filter_sizes=None,
 		num_filters=None,
 		max_sentence_length=None,
@@ -92,7 +93,7 @@ class SentenceCNN_NonLinearFC:
 
 		# HIDDEN LAYER
 
-		hidden_layer_size = 2*num_classes
+		hidden_layer_size = num_classes
 		W_hidden = tf.get_variable("W_hidden", shape=(num_filters_total, hidden_layer_size), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
 		b_hidden = tf.Variable(tf.constant(0.1, shape=(hidden_layer_size,)))
 
@@ -119,11 +120,15 @@ class SentenceCNN_NonLinearFC:
 		#
 		###############
 
+		global_step = tf.Variable(0, trainable=False)
+
 		# optimization method
-		self.optimizer = optimizer(learning_rate=self.learning_rate)
+		self.optimizer = optimizer(
+			learning_rate=tf.train.exponential_decay(learning_rate, global_step, 1000000, learning_decay_rate, staircase=True)
+		)
 
 		# training operation
-		self.train_op = self.optimizer.minimize(self.loss)
+		self.train_op = self.optimizer.minimize(self.loss, global_step=global_step)
 
 		# saver
 		self.saver = tf.train.Saver()
@@ -131,9 +136,9 @@ class SentenceCNN_NonLinearFC:
 		# initialize variables
 		self.session.run(tf.global_variables_initializer(), feed_dict={self.embeddings_placeholder: embeddings})
 
-	def train_step(self, input_x, input_y): # TODO additional parameters
-		_, loss = self.session.run([self.train_op, self.loss], feed_dict={self.input_x: input_x, self.input_y: input_y, self.dropout_keep_prob: self.dropout_keep_prob_train}) # TODO additional parameters
+	def train_step(self, input_x, input_y):
+		_, loss = self.session.run([self.train_op, self.loss], feed_dict={self.input_x: input_x, self.input_y: input_y, self.dropout_keep_prob: self.dropout_keep_prob_train})
 		return loss
 
-	def feed(self, input_x): # TODO additional parameters
-		return self.session.run([self.output, self.predictions], feed_dict={self.input_x: input_x, self.dropout_keep_prob: 1}) # TODO additional parameters
+	def feed(self, input_x):
+		return self.session.run([self.output, self.predictions], feed_dict={self.input_x: input_x, self.dropout_keep_prob: 1})
