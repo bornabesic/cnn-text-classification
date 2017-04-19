@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class SentenceCNN_NonLinearFC:
+class CNN_NonLinearFC:
 
 	def __init__(self,
 		model_name=None, session=None,

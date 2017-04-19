@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class SentenceCNN_YoonKim:
+class CNN_YoonKim_Xavier:
 
 	def __init__(self,
 		model_name=None, session=None,
@@ -41,7 +41,7 @@ class SentenceCNN_YoonKim:
 		self.dropout_keep_prob = tf.placeholder(dtype=tf.float32, name="dropout_keep_prob")
 
 		# ===== EMBEDDING LAYER
-		self.embeddings_placeholder = tf.placeholder(shape=(vocabulary_size, embedding_dim), dtype=tf.float32)
+		self.embeddings_placeholder = tf.placeholder(tf.float32, shape=(vocabulary_size, embedding_dim))
 
 		self.embeddings=tf.Variable(self.embeddings_placeholder, trainable = not static)
 		self.new_embeddings=tf.Variable(new_embeddings, trainable = True)
@@ -54,9 +54,9 @@ class SentenceCNN_YoonKim:
 		self.input_x_expanded = tf.expand_dims(self.embedded_words, -1)
 
 		self.pool_results=[]
-		for filter_size in filter_sizes:
+		for i, filter_size in enumerate(filter_sizes):
 
-			filter = tf.Variable(tf.truncated_normal(shape=(filter_size, embedding_dim, 1, num_filters)))
+			filter = tf.get_variable("filter"+str(i), shape=(filter_size, embedding_dim, 1, num_filters), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
 			if max_l2_norm!=0:
 				filter = tf.clip_by_norm(filter, max_l2_norm)
 			bias = tf.Variable(tf.constant(0.0, shape=(num_filters,)))
@@ -91,7 +91,7 @@ class SentenceCNN_YoonKim:
 
 		# FULLY CONNECTED LAYER
 
-		W = tf.Variable(tf.truncated_normal(shape=(num_filters_total, num_classes)))
+		W = tf.get_variable("W", shape=(num_filters_total, num_classes), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
 		b = tf.Variable(tf.constant(0.1, shape=(num_classes,)))
 
 		self.output = tf.nn.xw_plus_b(self.dropout, W, b, name="output")
@@ -104,7 +104,6 @@ class SentenceCNN_YoonKim:
 			self.loss = tf.add(tf.reduce_mean(losses), tf.multiply(self.regularization_lambda, l2_loss), name="loss")
 		else:
 			self.loss = tf.reduce_mean(losses, name="loss")
-
 
 
 		#
