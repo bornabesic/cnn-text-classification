@@ -20,17 +20,27 @@ tf.flags.DEFINE_integer("NUM_FILTERS", 100, "Number of filters per region size")
 tf.flags.DEFINE_boolean("STATIC_EMBEDDINGS", True, "Word2Vec embeddings will not be fine-tuned during the training")
 tf.flags.DEFINE_float("MAX_L2_NORM", 3, "Maximum L2 norm for convolutional layer weights")
 tf.flags.DEFINE_float("REG_LAMBDA", 0, "Lambda regularization parameter")
-tf.flags.DEFINE_float("DROPOUT_KEEP_PROB", 0.5, "Neuron keep probability for dropout layer")
+tf.flags.DEFINE_float("DROPOUT_PROB", 0.3, "Neuron dropout probability")
 tf.flags.DEFINE_float("LEARNING_RATE", 1e-3, "Initial learning rate value")
 tf.flags.DEFINE_float("LEARNING_DECAY_RATE", 0.95, "Rate at which learning rate will exponentially decay during the training")
-tf.flags.DEFINE_string("MODEL", "SentenceCNN_YoonKim_Xavier", "Neural network model to use")
+tf.flags.DEFINE_string("MODEL", "CNN_YoonKim_Xavier", "Neural network model to use")
+
+tf.flags.DEFINE_boolean("SAVE", False, "Model will be saved")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
 
 today = datetime.today()
 
-id_string = "{}-{}-{}-{}-{}-{}-{}".format(FLAGS.DATASET, today.day, today.month, today.year, today.hour, today.minute, today.second)
+id_string = "{}_{}_{:02}-{:02}-{:02}_{:02}-{:02}".format(
+	FLAGS.DATASET,
+	"_".join(FLAGS.MODEL.split("_")[1:]),
+	today.day,
+	today.month,
+	int(str(today.year)[-2:]),
+	today.hour,
+	today.minute
+)
 
 logger = Logger(
 	id_string+".txt",
@@ -88,7 +98,7 @@ with tf.Session(config=config) as sess, logger:
 		embedding_dim=word2vec.vector_dimension,
 		max_l2_norm=FLAGS.MAX_L2_NORM,
 		regularization_lambda=FLAGS.REG_LAMBDA,
-		dropout_keep_prob=FLAGS.DROPOUT_KEEP_PROB
+		dropout_keep_prob=1-FLAGS.DROPOUT_PROB
 	)
 
 	start_time = time.time()
@@ -123,4 +133,5 @@ with tf.Session(config=config) as sess, logger:
 
 	logger.log("Test set accuracy: " + str(correct/len(test)*100) + " %")
 
-	data.save_model(neural_network)
+	if FLAGS.SAVE:
+		data.save_model(neural_network)

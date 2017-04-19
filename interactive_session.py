@@ -6,28 +6,26 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import data
 import tensorflow as tf
 
-tf.flags.DEFINE_string("MODEL", None, "Neural network model to use")
 tf.flags.DEFINE_string("MODEL_NAME", None, "Name of a saved model")
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
 
-if FLAGS.MODEL==None:
-	raise ValueError("Neural network model not specified!")
-elif FLAGS.MODEL_NAME==None:
+if FLAGS.MODEL_NAME==None:
 	raise ValueError("Model name not specified!")
 
+tokens = FLAGS.MODEL_NAME.split("_")
+dataset = tokens[0]
+model = "_".join(["CNN"]+tokens[1:-2])
 
 with tf.Session() as sess:
 
-	neural_network = data.load_model(sess, model=FLAGS.MODEL, model_name=FLAGS.MODEL_NAME)
+	neural_network = data.load_model(sess, model=model, model_name=FLAGS.MODEL_NAME)
 	input_x = neural_network.input_x
 	input_y = neural_network.input_y
 
 	max_sentence_length = input_x.get_shape()[1]
 	num_classes = input_y.get_shape()[1]
-
-	dataset = FLAGS.MODEL_NAME.split("-")[0]
 
 	class_dict=data.get_dataset_classes(dataset)
 
