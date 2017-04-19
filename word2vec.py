@@ -38,16 +38,22 @@ def word_index(word, generate=False):
 
 	return indices_dictionary[word]
 
+def load_embeddings():
+	with open("word2vec_vectors", "rb") as word2vec_vectors_file:
+		for i in range(vocabulary_size):
+			bytes = word2vec_vectors_file.read(vector_size)
+			embeddings[i]=vector_struct.unpack(bytes)
+
+	# vector for unknown words
+	embeddings[0]=[0 for _ in range(vector_dimension)]
+
+def load_new_indices(file_path):
+	with open(file_path, "r", encoding="utf8") as new_indices_file:
+		for line in new_indices_file:
+			line_tokens = line.strip("\n").split("\t")
+			indices_dictionary[line_tokens[0]]=int(line_tokens[1])
+
 # initialization
-with open("word2vec_vectors", "rb") as word2vec_vectors_file:
-	for i in range(vocabulary_size):
-		bytes = word2vec_vectors_file.read(vector_size)
-		embeddings[i]=vector_struct.unpack(bytes)
-
-# TODO vector for unknown words
-embeddings[0]=[0 for _ in range(vector_dimension)]
-#
-
 with open("word2vec_indices", "r", encoding="utf8") as word2vec_indices_file:
 	word_counter=0
 	for line in word2vec_indices_file:

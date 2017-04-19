@@ -32,14 +32,15 @@ FLAGS._parse_flags()
 
 today = datetime.today()
 
-id_string = "{}_{}_{:02}-{:02}-{:02}_{:02}-{:02}".format(
+id_string = "{}_{}_{:02}-{:02}-{:02}_{:02}-{:02}-{:02}".format(
 	FLAGS.DATASET,
 	"_".join(FLAGS.MODEL.split("_")[1:]),
 	today.day,
 	today.month,
 	int(str(today.year)[-2:]),
 	today.hour,
-	today.minute
+	today.minute,
+	today.second
 )
 
 logger = Logger(
@@ -47,10 +48,13 @@ logger = Logger(
 	print_to_stdout=True
 )
 
+logger.log("ID: "+id_string)
+logger.log("")
+
 logger.log("Hyperparameters:")
 for param, value in sorted(FLAGS.__flags.items()):
 	logger.log(param + ": " + str(value))
-logger.log()
+logger.log("")
 
 train, test, num_classes, class_dict, max_sentence_length = data.load_dataset(FLAGS.DATASET)
 
@@ -81,6 +85,7 @@ with tf.Session(config=config) as sess, logger:
 
 	model_class = data.get_model_class(FLAGS.MODEL)
 
+	word2vec.load_embeddings()
 	neural_network = model_class(
 		model_name=id_string,
 		session=sess,

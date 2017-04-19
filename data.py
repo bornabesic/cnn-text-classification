@@ -250,6 +250,16 @@ def save_model(model, step=None):
 	except FileExistsError:
 		pass
 
+	# save all indices in word2vec.indices_dictionary.values() greater than word2vec.vocabulary_size
+	with open(base_path+"new_word2vec_indices", "w", encoding="utf8") as new_word2vec_indices:
+		for word in word2vec.indices_dictionary:
+			index = word2vec.indices_dictionary[word]
+			if index<word2vec.vocabulary_size:
+				continue
+
+			print(word+"\t"+str(index), file=new_word2vec_indices)
+
+
 	model.saver.save(sess=model.session, save_path=base_path+model.model_name, global_step=step)
 
 def load_model(session, model, model_name):
@@ -262,6 +272,8 @@ def load_model(session, model, model_name):
 	neural_network.model_name=model_name
 
 	base_path = "./models/"+model_name+"/"
+
+	word2vec.load_new_indices(base_path+"new_word2vec_indices")
 
 	latest = tf.train.latest_checkpoint(base_path)
 
