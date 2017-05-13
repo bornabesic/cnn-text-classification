@@ -38,19 +38,17 @@ with tf.Session() as sess:
 	for k in class_dict.keys():
 		reverse_class_dict[tuple(class_dict[k])]=k
 	
-	try:
-		while True:
-			sentence = input("> ")
-			word_indices = data.index_and_align(data.process_sentence(sentence), max_sentence_length)
-			output, prediction = neural_network.feed([word_indices])
-			probabilities = sess.run(tf.nn.softmax(output))[0]
+	while True:
+		sentence = input("> ")
+		if sentence=="exit": break
 
-			max_index = int(prediction[0])
+		word_indices = data.index_and_align(data.process_sentence(sentence), max_sentence_length)
+		output, prediction = neural_network.feed([word_indices])
+		probabilities = sess.run(tf.nn.softmax(output))[0]
 
-			for i in range(num_classes):
-				one_hot=tuple([0 if j!=i else 1 for j in range(num_classes)])
-				print("{}\t{}\t{}".format(reverse_class_dict[one_hot], probabilities[i], "*" if i==max_index else ""))
-			print()
+		max_index = int(prediction[0])
 
-	except KeyboardInterrupt:
-		pass
+		for i in range(num_classes):
+			one_hot=tuple([0 if j!=i else 1 for j in range(num_classes)])
+			print("{}\t{:6.2f}%\t{}".format(reverse_class_dict[one_hot], probabilities[i]*100, "*" if i==max_index else ""))
+		print()
