@@ -37,7 +37,7 @@ with tf.Session() as sess:
 	reverse_class_dict=dict()
 	for k in class_dict.keys():
 		reverse_class_dict[tuple(class_dict[k])]=k
-	
+
 	while True:
 		sentence = input("> ")
 		if sentence=="exit": break
@@ -50,5 +50,5 @@ with tf.Session() as sess:
 
 		for i in range(num_classes):
 			one_hot=tuple([0 if j!=i else 1 for j in range(num_classes)])
-			print("{}\t{:6.2f}%\t{}".format(reverse_class_dict[one_hot], probabilities[i]*100, "*" if i==max_index else ""))
+			print("{:10}{:10.2f} % {}".format(reverse_class_dict[one_hot], probabilities[i]*100, "*" if i==max_index else ""))
 		print()

@@ -19,13 +19,16 @@ tf.flags.DEFINE_string("REGION_SIZES", "3,4,5", "Region sizes for convolutional 
 tf.flags.DEFINE_integer("NUM_FILTERS", 100, "Number of filters per region size")
 tf.flags.DEFINE_boolean("STATIC_EMBEDDINGS", True, "Word2Vec embeddings will not be fine-tuned during the training")
 tf.flags.DEFINE_float("MAX_L2_NORM", 3, "Maximum L2 norm for convolutional layer weights")
-tf.flags.DEFINE_float("REG_LAMBDA", 0, "Lambda regularization parameter")
-tf.flags.DEFINE_float("DROPOUT_PROB", 0.3, "Neuron dropout probability")
-tf.flags.DEFINE_float("LEARNING_RATE", 1e-3, "Initial learning rate value")
+tf.flags.DEFINE_float("REG_LAMBDA", 0, "Lambda regularization parameter for fully-connected layer")
+tf.flags.DEFINE_float("DROPOUT_PROB", 0.5, "Neuron dropout probability")
+tf.flags.DEFINE_float("LEARNING_RATE", 3e-4, "Initial learning rate value")
 tf.flags.DEFINE_float("LEARNING_DECAY_RATE", 0.95, "Rate at which learning rate will exponentially decay during the training")
 tf.flags.DEFINE_string("MODEL", "CNN_YoonKim_Xavier", "Neural network model to use")
+tf.flags.DEFINE_integer("EVAL_CHECKPOINT", 50, "Evaluate the model every this number of epochs")
 
+tf.flags.DEFINE_boolean("GPU_ALLOW_GROWTH", True, "Only grow memory usage as is needed by the process")
 tf.flags.DEFINE_boolean("SAVE", False, "Model will be saved")
+
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
@@ -80,7 +83,7 @@ for i in range(len(test)):
 
 
 config = tf.ConfigProto()
-config.gpu_options.allow_growth=True
+config.gpu_options.allow_growth=FLAGS.GPU_ALLOW_GROWTH
 with tf.Session(config=config) as sess, logger:
 
 	model_class = data.get_model_class(FLAGS.MODEL)
@@ -106,10 +109,21 @@ with tf.Session(config=config) as sess, logger:
 		dropout_keep_prob=1-FLAGS.DROPOUT_PROB
 	)
 
+	def evaluate():
+		logger.log("Evaluating...", end=" ")
+		correct=0
+		for i in range(len(test)):
+			indices, label = test[i]
+			output, predictions = neural_network.feed([indices])
+			accuracy=label[predictions[0]]
+			correct+=accuracy
+
+		logger.log("Test set accuracy: " + str(correct/len(test)*100) + " %")
+
 	start_time = time.time()
 	batch_indices = data.generate_partitions(len(train), FLAGS.BATCH_SIZE)
 	try: # allow user to end training using Ctrl+C
-		for epoch in range(FLAGS.NUM_EPOCHS):
+		for epoch in range(1, FLAGS.NUM_EPOCHS+1):
 			random.shuffle(train)
 			avg_loss=0
 
@@ -121,6 +135,10 @@ with tf.Session(config=config) as sess, logger:
 			avg_loss/=len(batch_indices)
 			logger.log("Epoch " + str(epoch) + " loss: " + str(avg_loss))
 
+			if epoch%FLAGS.EVAL_CHECKPOINT==0:
+				evaluate()
+
+
 	except KeyboardInterrupt:
 		pass
 
@@ -128,15 +146,8 @@ with tf.Session(config=config) as sess, logger:
 	training_minutes=int((end_time-start_time)//60)
 	training_seconds=int((end_time-start_time)-training_minutes*60)
 
-	logger.log("Training DONE ({} m {} s). Evaluating...".format(training_minutes, training_seconds))
-	correct=0
-	for i in range(len(test)):
-		indices, label = test[i]
-		output, predictions = neural_network.feed([indices])
-		accuracy=label[predictions[0]]
-		correct+=accuracy
-
-	logger.log("Test set accuracy: " + str(correct/len(test)*100) + " %")
+	logger.log("Training DONE ({} m {} s).".format(training_minutes, training_seconds))
+	evaluate()
 
 	if FLAGS.SAVE:
 		data.save_model(neural_network)

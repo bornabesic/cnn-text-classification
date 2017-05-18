@@ -11,10 +11,10 @@ class Logger:
 		self.print_to_stdout=print_to_stdout
 		self.file = open(base_path+file_name, "w", encoding="UTF-8")
 
-	def log(self, message=""):
+	def log(self, message="", end="\n"):
 		if self.print_to_stdout:
-			print(message)
-		print(message, file=self.file)
+			print(message, end=end)
+		print(message, end=end, file=self.file)
 
 	def close(self):
 		self.file.close()
