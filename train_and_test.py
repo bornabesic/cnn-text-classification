@@ -23,7 +23,7 @@ tf.flags.DEFINE_float("REG_LAMBDA", 0, "Lambda regularization parameter for full
 tf.flags.DEFINE_float("DROPOUT_PROB", 0.5, "Neuron dropout probability")
 tf.flags.DEFINE_float("LEARNING_RATE", 3e-4, "Initial learning rate value")
 tf.flags.DEFINE_float("LEARNING_DECAY_RATE", 0.95, "Rate at which learning rate will exponentially decay during the training")
-tf.flags.DEFINE_string("MODEL", "CNN_YoonKim_Xavier", "Neural network model to use")
+tf.flags.DEFINE_string("MODEL", "CNN_YoonKim", "Neural network model to use")
 tf.flags.DEFINE_integer("EVAL_CHECKPOINT", 50, "Evaluate the model every this number of epochs")
 
 tf.flags.DEFINE_boolean("GPU_ALLOW_GROWTH", True, "Only grow memory usage as is needed by the process")
