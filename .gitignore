@@ -5,6 +5,7 @@
 !CNN_YoonKim.py
 !data.py
 !datasets/
+!HR_datasets/
 !interactive_session.py
 !LICENSE
 !Logger.py
@@ -13,3 +14,4 @@
 !train_and_test.py
 !transform_word2vec.c
 !word2vec.py
+
