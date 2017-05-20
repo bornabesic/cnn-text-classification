@@ -6,6 +6,10 @@
 !data.py
 !datasets/
 !HR_datasets/
+!HR_CNN_YoonKim.py
+!HR_data.py
+!HR_train_and_test.py
+!HR_vocabulary.py
 !interactive_session.py
 !LICENSE
 !Logger.py
