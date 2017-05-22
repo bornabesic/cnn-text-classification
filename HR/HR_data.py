@@ -125,13 +125,11 @@ def save_model(model, step=None):
 		pass
 
 	# save all indices in word2vec.indices_dictionary.values() greater than word2vec.vocabulary_size
-	with open(base_path+"new_word2vec_indices", "w", encoding="utf8") as new_word2vec_indices:
-		for word in word2vec.indices_dictionary:
-			index = word2vec.indices_dictionary[word]
-			if index<word2vec.vocabulary_size:
-				continue
+	with open(base_path+"indices", "w", encoding="utf8") as indices:
+		for word in HR_vocabulary.indices_dictionary:
+			index = HR_vocabulary.indices_dictionary[word]
 
-			print(word+"\t"+str(index), file=new_word2vec_indices)
+			print(word+"\t"+str(index), file=indices)
 
 
 	model.saver.save(sess=model.session, save_path=base_path+model.model_name, global_step=step)
@@ -147,7 +145,12 @@ def load_model(session, model, model_name):
 
 	base_path = "./models/"+model_name+"/"
 
-	word2vec.load_new_indices(base_path+"new_word2vec_indices")
+	with open(base_path+"indices", "r", encoding="utf-8") as indices:
+		for line in indices:
+			tokens = line.strip("\n").split("\t")
+			word = tokens[0]
+			index = tokens[1]
+			HR_vocabulary.indices_dictionary[word]=index
 
 	latest = tf.train.latest_checkpoint(base_path)
 

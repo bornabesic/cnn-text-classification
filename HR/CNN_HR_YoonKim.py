@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class HR_CNN_YoonKim:
+class CNN_HR_YoonKim:
 
 	def __init__(self,
 		model_name=None, session=None,
