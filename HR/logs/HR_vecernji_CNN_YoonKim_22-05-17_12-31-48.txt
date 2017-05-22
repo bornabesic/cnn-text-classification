@@ -1,0 +1,39 @@
+ID: HR_vecernji_CNN_YoonKim_22-05-17_12-31-48
+
+Hyperparameters:
+BATCH_SIZE: 50
+DATASET: vecernji
+DROPOUT_PROB: 0.5
+EVAL_CHECKPOINT: 10
+GPU_ALLOW_GROWTH: True
+LEARNING_DECAY_RATE: 0.95
+LEARNING_RATE: 0.0003
+MAX_DOCUMENT_SIZE: 0
+MAX_L2_NORM: 0
+MODEL: HR_CNN_YoonKim
+NUM_EPOCHS: 500
+NUM_FILTERS: 64
+REGION_SIZES: 3,4,5
+REG_LAMBDA: 0
+SAVE: False
+VECTOR_DIM: 64
+VOCABULARY_SIZE: 50000
+
+Train set size: 11076
+Test set size: 2763
+Classes: 9
+Max sentence length: 8323
+
+Epoch 1 loss: 1.76701535459
+Epoch 2 loss: 1.30710530335
+Epoch 3 loss: 1.03058625825
+Epoch 4 loss: 0.841427914865
+Epoch 5 loss: 0.706380997155
+Epoch 6 loss: 0.608179934793
+Epoch 7 loss: 0.519015387842
+Epoch 8 loss: 0.449038949904
+Epoch 9 loss: 0.378611016985
+Epoch 10 loss: 0.31408264884
+Evaluating... Test set accuracy: 80.4922186029678 %
+Training DONE (12 m 32 s).
+Evaluating... 
