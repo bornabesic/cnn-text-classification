@@ -1,6 +1,7 @@
 import sys
 import os
 import HR_vocabulary
+import random
 
 def get_model_class(model):
 	# class <model_name> from <model_name>.py
@@ -40,25 +41,14 @@ def process_sentence(sentence, max_size):
 
 def get_dataset_classes(dataset_name):
 	one_hot=None
-	if dataset_name=="vecernji":
+	if dataset_name=="HR-portali":
 		one_hot = {
-			"auti":			[1, 0, 0, 0, 0, 0, 0, 0, 0],
-			"biznis":		[0, 1, 0, 0, 0, 0, 0, 0, 0],
-			"kultura":		[0, 0, 1, 0, 0, 0, 0, 0, 0],
-			"lifestyle":	[0, 0, 0, 1, 0, 0, 0, 0, 0],
-			"showbiz":		[0, 0, 0, 0, 1, 0, 0, 0, 0],
-			"sport":		[0, 0, 0, 0, 0, 1, 0, 0, 0],
-			"techsci":		[0, 0, 0, 0, 0, 0, 1, 0, 0],
-			"vijesti":		[0, 0, 0, 0, 0, 0, 0, 1, 0],
-			"zagreb":		[0, 0, 0, 0, 0, 0, 0, 0, 1]
-		}
-	elif dataset_name=="24-sata":
-		one_hot = {
-			"lifestyle":			[1, 0, 0, 0, 0],
-			"news":					[0, 1, 0, 0, 0],
-			"show":					[0, 0, 1, 0, 0],
-			"sport":				[0, 0, 0, 1, 0],
-			"tech":					[0, 0, 0, 0, 1]
+			"kultura":		[1, 0, 0, 0, 0,],
+			"vijesti":		[0, 1, 0, 0, 0,],
+			"novac":		[0, 0, 1, 0, 0,],
+			"show":			[0, 0, 0, 1, 0,],
+			"sport":		[0, 0, 0, 0, 1,]
+
 		}
 	return one_hot
 
@@ -78,12 +68,22 @@ def load_dataset(dataset_name, vocabulary_size, max_document_size):
 	category_dirs = [os.path.join(base_path, dataset_name, d) for d in os.listdir(os.path.join(base_path, dataset_name)) if os.path.isdir(os.path.join(base_path, dataset_name, d))]
 
 	for category_dir in category_dirs:
-		category_name = os.path.basename(category_dir)
-		train_dir = os.path.join(category_dir, "train")
-		test_dir = os.path.join(category_dir, "test")
 
-		train_files = [os.path.join(train_dir, f) for f in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, f))]
-		test_files = [os.path.join(test_dir, f) for f in os.listdir(test_dir) if os.path.isfile(os.path.join(test_dir, f))]
+		category_name = os.path.basename(category_dir)
+		all_files = [os.path.join(category_dir, f) for f in os.listdir(category_dir) if os.path.isfile(os.path.join(category_dir, f))]
+		LIMIT = 3000
+		if len(all_files)>LIMIT:
+			sampled_files=random.sample(all_files, LIMIT)
+		else:
+			sampled_files=all_files
+
+		sampled_files=set(sampled_files)
+
+		num_train_files = int(len(sampled_files)*0.8)
+		num_test_files = len(sampled_files)-num_train_files
+
+		train_files = set(random.sample(sampled_files, num_train_files))
+		test_files = sampled_files-train_files
 
 		for train_file in train_files:
 			with open(train_file, "r", encoding="utf8") as f:

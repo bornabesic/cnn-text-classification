@@ -14,7 +14,7 @@ from Logger import Logger
 
 tf.flags.DEFINE_integer("BATCH_SIZE", 50, "Training batch size")
 tf.flags.DEFINE_integer("NUM_EPOCHS", 500, "Number of training epochs")
-tf.flags.DEFINE_string("DATASET", "vecernji", "Dataset to perform training and testing on")
+tf.flags.DEFINE_string("DATASET", "HR-portali", "Dataset to perform training and testing on")
 tf.flags.DEFINE_string("REGION_SIZES", "3,4,5", "Region sizes for convolutional layer")
 tf.flags.DEFINE_integer("NUM_FILTERS", 64, "Number of filters per region size")
 tf.flags.DEFINE_float("MAX_L2_NORM", 0, "Maximum L2 norm for convolutional layer weights")
