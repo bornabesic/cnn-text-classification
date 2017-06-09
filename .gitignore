@@ -6,6 +6,7 @@
 !data.py
 !datasets/
 !interactive_session.py
+!interactive_session_GUI.py
 !LICENSE
 !Logger.py
 !ModelBlueprint.py
