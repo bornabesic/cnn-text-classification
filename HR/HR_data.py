@@ -233,6 +233,15 @@ def get_dataset_classes(dataset_name):
 			"sport":		[0, 0, 0, 0, 1,]
 
 		}
+	elif dataset_name=="pjesnici":
+		one_hot = {
+			"Cesarić":				[1, 0, 0, 0, 0,],
+			"Domjanić":			[0, 1, 0, 0, 0,],
+			"Tadijanović":			[0, 0, 1, 0, 0,],
+			"Kranjčević":	[0, 0, 0, 1, 0,],
+			"Ujević":					[0, 0, 0, 0, 1,]
+
+		}
 	return one_hot
 
 vocabulary=dict()
@@ -243,10 +252,14 @@ def load_dataset(dataset_name, vocabulary_size, max_document_size):
 	train=[]
 	test=[]
 	max_sentence_length=0
+	LIMIT=None
 
 	one_hot = get_dataset_classes(dataset_name)
 	if one_hot==None:
 		raise ValueError("Unknown dataset.")
+
+	if dataset_name=="HR-portali":
+		LIMIT = 3000
 
 	category_dirs = [os.path.join(base_path, dataset_name, d) for d in os.listdir(os.path.join(base_path, dataset_name)) if os.path.isdir(os.path.join(base_path, dataset_name, d))]
 
@@ -254,8 +267,7 @@ def load_dataset(dataset_name, vocabulary_size, max_document_size):
 
 		category_name = os.path.basename(category_dir)
 		all_files = [os.path.join(category_dir, f) for f in os.listdir(category_dir) if os.path.isfile(os.path.join(category_dir, f))]
-		LIMIT = 3000
-		if len(all_files)>LIMIT:
+		if LIMIT!=None and len(all_files)>LIMIT:
 			sampled_files=random.sample(all_files, LIMIT)
 		else:
 			sampled_files=all_files
