@@ -1,4 +1,4 @@
-[PDF](pdf/Borna_Besic_Zavrsni_rad_v1_0.pdf)
+[PDF](pdf/Borna_Besic_Zavrsni_rad_v1_0.pdf) | [Croatian Digital Theses Repository](https://urn.nsk.hr/urn:nbn:hr:168:835033)
 
 ### Analiza teksta pomoću dubokih neuronskih mreža
 
